@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Hacker Blog</title>
-    <link>https://yusei-wy.github.io/hackerblog/</link>
+    <link>https://yusei-wy.github.io/</link>
     <description>Recent content on Hacker Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <lastBuildDate>Sun, 14 Apr 2019 15:52:26 +0900</lastBuildDate>
     
-	<atom:link href="https://yusei-wy.github.io/hackerblog/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://yusei-wy.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>ブログ始めました</title>
-      <link>https://yusei-wy.github.io/hackerblog/posts/firstpost/</link>
+      <link>https://yusei-wy.github.io/posts/firstpost/</link>
       <pubDate>Sun, 14 Apr 2019 15:52:26 +0900</pubDate>
       
-      <guid>https://yusei-wy.github.io/hackerblog/posts/firstpost/</guid>
+      <guid>https://yusei-wy.github.io/posts/firstpost/</guid>
       <description>はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo</description>
     </item>
     
