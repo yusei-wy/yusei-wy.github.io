@@ -1,0 +1,27 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on Hacker Blog</title>
+        <link>https://yusei-wy.github.io/hackerblog/posts/</link>
+        <description>Recent content in Posts on Hacker Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>ja</language>
+        <lastBuildDate>Sun, 14 Apr 2019 15:52:26 +0900</lastBuildDate>
+        <atom:link href="https://yusei-wy.github.io/hackerblog/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>ブログ始めました</title>
+            <link>https://yusei-wy.github.io/hackerblog/posts/firstpost/</link>
+            <pubDate>Sun, 14 Apr 2019 15:52:26 +0900</pubDate>
+            
+            <guid>https://yusei-wy.github.io/hackerblog/posts/firstpost/</guid>
+            <description>はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo</description>
+            <content type="html"><![CDATA[<p>はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo でブログを書くことにしました。</p>
+
+<p>記事の内容は今勉強しているアルゴリズムについてや個人プロジェクトのことについて書いていこうと思います。</p>
+
+<p>ではよろしくお願いします。</p>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>
