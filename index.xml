@@ -6,10 +6,19 @@
     <description>Recent content on Hacker Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 14 Apr 2019 15:52:26 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 14 Apr 2019 17:02:17 +0900</lastBuildDate>
     
 	<atom:link href="https://yusei-wy.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>About</title>
+      <link>https://yusei-wy.github.io/about/</link>
+      <pubDate>Sun, 14 Apr 2019 17:02:17 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/about/</guid>
+      <description>プロフィール 2008&amp;frasl;04 - 2011&amp;frasl;03 徳島県立小松島西高等学校商業科 2011&amp;frasl;07 - 現在 株式会社アマタ SNS アカウント Twitter: @yusei_wy GitHub: yusei-wy 概要 フロントエンドエンジニア スマートフォン用サイト</description>
+    </item>
     
     <item>
       <title>ブログ始めました</title>

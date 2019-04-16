@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pages on Hacker Blog</title>
+    <link>https://yusei-wy.github.io/pages/</link>
+    <description>Recent content in Pages on Hacker Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sun, 14 Apr 2019 17:02:17 +0900</lastBuildDate>
+    
+	<atom:link href="https://yusei-wy.github.io/pages/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>https://yusei-wy.github.io/pages/about/</link>
+      <pubDate>Sun, 14 Apr 2019 17:02:17 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/pages/about/</guid>
+      <description>プロフィール 2008&amp;frasl;04 - 2011&amp;frasl;03 徳島県立小松島西高等学校商業科 2011&amp;frasl;07 - 現在 株式会社アマタ SNS アカウント Twitter: @yusei_wy GitHub: yusei-wy 概要 フロントエンドエンジニア スマートフォン用サイト</description>
+    </item>
+    
+  </channel>
+</rss>
