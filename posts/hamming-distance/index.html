@@ -7,15 +7,15 @@
 <meta name="author"
     content="">
 <meta name="description"
-    content="はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo" />
+    content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&amp;r" />
 <meta name="keywords" content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="https://yusei-wy.github.io/posts/firstpost/" />
+<link rel="canonical" href="https://yusei-wy.github.io/posts/hamming-distance/" />
 
 
 <title>
     
-    ブログ始めました :: Hacker Blog 
+    ハミング距離 :: Hacker Blog 
     
 </title>
 
@@ -36,25 +36,25 @@
 <link rel="mask-icon" href="https://yusei-wy.github.io/safari-pinned-tab.svg" color="#252627">
 <link rel="shortcut icon" href="https://yusei-wy.github.io/favicon.ico">
 <meta name="theme-color" content="#252627">
-<meta itemprop="name" content="ブログ始めました">
-<meta itemprop="description" content="はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo">
+<meta itemprop="name" content="ハミング距離">
+<meta itemprop="description" content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&r">
 
 
-<meta itemprop="datePublished" content="2019-04-14T15:52:26&#43;09:00" />
-<meta itemprop="dateModified" content="2019-04-14T15:52:26&#43;09:00" />
-<meta itemprop="wordCount" content="149">
+<meta itemprop="datePublished" content="2019-04-16T20:08:32&#43;09:00" />
+<meta itemprop="dateModified" content="2019-04-16T20:08:32&#43;09:00" />
+<meta itemprop="wordCount" content="180">
 
 
 
-<meta itemprop="keywords" content="" />
+<meta itemprop="keywords" content="アルゴリズム," />
 <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="ブログ始めました"/>
-<meta name="twitter:description" content="はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo"/>
+<meta name="twitter:title" content="ハミング距離"/>
+<meta name="twitter:description" content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&r"/>
 
 
 
 
-<meta property="article:published_time" content="2019-04-14 15:52:26 &#43;0900 JST" />
+<meta property="article:published_time" content="2019-04-16 20:08:32 &#43;0900 JST" />
 
 
 
@@ -119,16 +119,55 @@
         </div>
 
         <article>
-            <h1 class="post-title"><a href="https://yusei-wy.github.io/posts/firstpost/">ブログ始めました</a></h1>
+            <h1 class="post-title"><a href="https://yusei-wy.github.io/posts/hamming-distance/">ハミング距離</a></h1>
 
             
 
             <div class="post-content">
-                <p>はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo でブログを書くことにしました。</p>
+                
 
-<p>記事の内容は今勉強しているアルゴリズムについてや個人プロジェクトのことについて書いていこうと思います。</p>
+<h2 id="ハミング距離とは">ハミング距離とは</h2>
 
-<p>ではよろしくお願いします。</p>
+<blockquote>
+<p>等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数
+出典：<a href="https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%9F%E3%83%B3%E3%82%B0%E8%B7%9D%E9%9B%A2">ハミング距離</a></p>
+</blockquote>
+
+<p>例えば</p>
+
+<pre><code>1001001
+1000101
+</code></pre>
+
+<p>このハミング距離は&rdquo;2&rdquo;</p>
+
+<pre><code>2239567
+2459587
+</code></pre>
+
+<p>このハミング距離は&rdquo;3&rdquo;</p>
+
+<pre><code>helloworld
+hollndorld
+</code></pre>
+
+<p>このハミング距離は&rdquo;3&rdquo;</p>
+
+<h2 id="求め方">求め方</h2>
+
+<p>ソースコードで表すと</p>
+
+<pre><code class="language-python">str1 = &quot;1001001&quot;
+str2 = &quot;1000101&quot;
+
+cnt = 0
+for s1, s2 in zip(list(str1), list(str2)):
+    if s1 is not s2:
+        cnt += 1
+print(cnt)  # 2
+</code></pre>
+
+<p>簡単ですね。</p>
 
             </div>
         </article>
@@ -136,10 +175,13 @@
         <hr />
 
         <div class="post-info">
+                <p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://yusei-wy.github.io/tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0">アルゴリズム</a></span>
+                </p>
 
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>149 Words</p>
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>180 Words</p>
 
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-04-14 15:52 &#43;0900</p>
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-04-16 20:08 &#43;0900</p>
         </div>
 
         
@@ -151,14 +193,14 @@
 
                 <div class="pagination__buttons">
                     
-                        <span class="button previous">
-                            <a href="https://yusei-wy.github.io/posts/hamming-distance/">
-                                <span class="button__icon">←</span>
-                                <span class="button__text">ハミング距離</span>
+
+                    
+                        <span class="button next">
+                            <a href="https://yusei-wy.github.io/posts/firstpost/">
+                                <span class="button__text">ブログ始めました</span>
+                                <span class="button__icon">→</span>
                             </a>
                         </span>
-                    
-
                     
                 </div>
             </div>

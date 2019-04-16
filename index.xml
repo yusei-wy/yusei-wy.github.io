@@ -6,10 +6,19 @@
     <description>Recent content on Hacker Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 14 Apr 2019 17:02:17 +0900</lastBuildDate>
+    <lastBuildDate>Tue, 16 Apr 2019 20:08:32 +0900</lastBuildDate>
     
 	<atom:link href="https://yusei-wy.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>ハミング距離</title>
+      <link>https://yusei-wy.github.io/posts/hamming-distance/</link>
+      <pubDate>Tue, 16 Apr 2019 20:08:32 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/posts/hamming-distance/</guid>
+      <description>ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&amp;r</description>
+    </item>
     
     <item>
       <title>About</title>
