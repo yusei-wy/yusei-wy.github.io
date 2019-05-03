@@ -6,10 +6,19 @@
     <description>Recent content on Hacker Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Tue, 16 Apr 2019 20:08:32 +0900</lastBuildDate>
+    <lastBuildDate>Fri, 03 May 2019 09:47:08 +0900</lastBuildDate>
     
 	<atom:link href="https://yusei-wy.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>職務経歴書</title>
+      <link>https://yusei-wy.github.io/resume/</link>
+      <pubDate>Fri, 03 May 2019 09:47:08 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/resume/</guid>
+      <description>プロフィール 氏名：笠原 悠聖(Kasahara Yusei) Twitter: @yusei_wy GitHub: yusei-wy 職務経歴（概要） スマホアプリの開発 設計 / 制作：5年 プログラミング：5年 Web フロントエンド</description>
+    </item>
     
     <item>
       <title>ハミング距離</title>
