@@ -5,8 +5,53 @@
         <description>Recent content in Posts on Hacker Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>ja</language>
-        <lastBuildDate>Tue, 16 Apr 2019 20:08:32 +0900</lastBuildDate>
+        <lastBuildDate>Fri, 07 Jun 2019 19:28:31 +0900</lastBuildDate>
         <atom:link href="https://yusei-wy.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>State パターン</title>
+            <link>https://yusei-wy.github.io/posts/state-pattern/</link>
+            <pubDate>Fri, 07 Jun 2019 19:28:31 +0900</pubDate>
+            
+            <guid>https://yusei-wy.github.io/posts/state-pattern/</guid>
+            <description>最近は『 リファクタリング 既存のコードを安全に改善する 』という本を読んでいます。 第 1 章で説明されていた State パターンについてのメモです。 State パターン</description>
+            <content type="html"><![CDATA[
+
+<p>最近は『
+<a href="https://www.amazon.co.jp/dp/B01IGW5MG0/ref=dp-kindle-redirect?_encoding=UTF8&amp;btkr=1" target="_blank" rel="noopener noreferrer">リファクタリング　既存のコードを安全に改善する</a>
+
+』という本を読んでいます。<br />
+第 1 章で説明されていた State パターンについてのメモです。</p>
+
+<h2 id="state-パターン-state-pattern-ステート-パターン-とは">State パターン（state pattern, ステート・パターン）とは</h2>
+
+<hr />
+
+<p>一般的なオブジェクト指向のプログラミング言語では、オブジェクトは自分が属するクラスを生存期間中に変更できない。
+この解決策が State パターン。</p>
+
+<blockquote>
+<p>プログラミングで用いられる振る舞いに関する（英語版） デザインパターンの一種である。このパターンはオブジェクトの状態（state）を表現するために用いられる。ランタイムでそのタイプを部分的に変化させるオブジェクトを扱うクリーンな手段となる<br />
+出典：<a href="https://ja.wikipedia.org/wiki/State_%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">State パターン</a></p>
+</blockquote>
+
+<p>例えば</p>
+
+<p>{{&lt; mermaid align=&ldquo;left&rdquo; &gt;}}
+sequenceDiagram
+participant Alice
+participant Bob
+Alice-&gt;&gt;John: Hello John, how are you?
+loop Healthcheck
+John-&gt;John: Fight against hypochondria
+end
+Note right of John: Rational thoughts <br/>prevail&hellip;
+John&ndash;&gt;Alice: Great!
+John-&gt;Bob: How about you?
+Bob&ndash;&gt;John: Jolly good!
+{{&lt; /mermaid &gt;}}</p>
+]]></content>
+        </item>
         
         <item>
             <title>ハミング距離</title>
@@ -18,6 +63,8 @@
             <content type="html"><![CDATA[
 
 <h2 id="ハミング距離とは">ハミング距離とは</h2>
+
+<hr />
 
 <blockquote>
 <p>等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数
@@ -45,6 +92,8 @@ hollndorld
 <p>このハミング距離は&rdquo;3&rdquo;</p>
 
 <h2 id="求め方">求め方</h2>
+
+<hr />
 
 <p>ソースコードで表すと</p>
 
