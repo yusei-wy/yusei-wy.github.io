@@ -6,10 +6,19 @@
     <description>Recent content on Hacker Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Fri, 07 Jun 2019 19:28:31 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 17 Aug 2019 12:09:50 +0900</lastBuildDate>
     
 	<atom:link href="https://yusei-wy.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>WorkLog① - Chrome 拡張の環境構築</title>
+      <link>https://yusei-wy.github.io/posts/worklog01/</link>
+      <pubDate>Sat, 17 Aug 2019 12:09:50 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/posts/worklog01/</guid>
+      <description>業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。 なのである程度自動化しよう</description>
+    </item>
     
     <item>
       <title>State パターン</title>
