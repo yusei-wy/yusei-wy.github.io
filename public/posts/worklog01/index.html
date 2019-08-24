@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author"
+    content="">
+<meta name="description"
+    content="業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。 なのである程度自動化しよう" />
+<meta name="keywords" content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://yusei-wy.github.io/posts/worklog01/" />
+
+
+<title>
+    
+    WorkLog① - Chrome 拡張の環境構築 :: Hacker Blog 
+    
+</title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="https://yusei-wy.github.io/main.min.6a7678f40434c7781747ffdd224a984179b2a3c81c81f19ccf845fdffbe80b7c.css">
+
+
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://yusei-wy.github.io/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://yusei-wy.github.io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://yusei-wy.github.io/favicon-16x16.png">
+<link rel="manifest" href="https://yusei-wy.github.io/site.webmanifest">
+<link rel="mask-icon" href="https://yusei-wy.github.io/safari-pinned-tab.svg" color="#252627">
+<link rel="shortcut icon" href="https://yusei-wy.github.io/favicon.ico">
+<meta name="theme-color" content="#252627">
+<meta itemprop="name" content="WorkLog① - Chrome 拡張の環境構築">
+<meta itemprop="description" content="業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。 なのである程度自動化しよう">
+
+
+<meta itemprop="datePublished" content="2019-08-17T12:09:50&#43;09:00" />
+<meta itemprop="dateModified" content="2019-08-24T17:48:14&#43;09:00" />
+<meta itemprop="wordCount" content="1203">
+
+
+
+<meta itemprop="keywords" content="Chrome拡張,create-react-app,React,TypeScript," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="WorkLog① - Chrome 拡張の環境構築"/>
+<meta name="twitter:description" content="業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。 なのである程度自動化しよう"/>
+
+
+
+
+<meta property="article:published_time" content="2019-08-17 12:09:50 &#43;0900 JST" />
+
+
+
+
+
+
+
+    </head>
+
+    <body class="">
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="https://yusei-wy.github.io/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">hello</span>
+            <span class="logo__cursor"></span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="https://yusei-wy.github.io/about">About</a></li><li><a href="https://yusei-wy.github.io/posts">Blog</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+
+            <span class="theme-toggle"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
+</svg>
+</span>
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>3 minutes
+
+            
+
+            </p>
+        </div>
+
+        <article>
+            <h1 class="post-title"><a href="https://yusei-wy.github.io/posts/worklog01/">WorkLog① - Chrome 拡張の環境構築</a></h1>
+
+            
+
+            <div class="post-content">
+                
+
+<p>業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。<br />
+なのである程度自動化しようと思い、ツールを開発することにしました。</p>
+
+<p>デスクトップアプリでは時間がかかりそうだったので、Chrome の拡張機能としてパパっと開発することにしました。</p>
+
+<p>基本的には以下のページを参考にしています。<br />
+<a href="https://medium.com/better-programming/create-a-chrome-extension-using-react-and-typescript-50e94e14320c">https://medium.com/better-programming/create-a-chrome-extension-using-react-and-typescript-50e94e14320c</a></p>
+
+<h2 id="プロジェクトの作成">プロジェクトの作成</h2>
+
+<hr />
+
+<p>React と TypeScript を使って拡張機能を開発するので、必要なパッケージをインストールしプロジェクトを作成します。</p>
+
+<pre><code>$ npm i -g create-react-app
+$ create-react-app my-app --typescript
+$ cd my-app
+</code></pre>
+
+<h2 id="エラーチェックとフォーマット">エラーチェックとフォーマット</h2>
+
+<hr />
+
+<p>エラーチェックとコードフォーマットのために eslint と prettier をインストールします。</p>
+
+<pre><code>$ yarn add -D husky lint-staged prettier eslint eslint-plugin-react eslint-plugin-prettier eslint-config-prettier eslint-plugin-import @typescript-eslint/{parser,eslint-plugin}
+</code></pre>
+
+<p><code>.eslintrc.js</code> ファイルを作成しエラーチェックとコードフォーマットを有効化します。</p>
+
+<pre><code class="language-js">module.exports = {
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
+    jest: true
+  },
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module'
+  },
+  plugins: ['import', 'prettier', 'react'],
+  rules: {
+    'prettier/prettier': [
+      'error',
+      {
+        semi: true,
+        singleQuote: true,
+        printWidth: 120,
+        tabWidth: 2
+      }
+    ],
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'off',
+      {
+        argsIgnorePattern: '^_'
+      }
+    ],
+    '@typescript-eslint/no-use-before-define': 'off',
+    // ordered-imports - tslint
+    'import/order': [
+      'error',
+      {
+        groups: [['external', 'builtin'], ['internal', 'index', 'sibling', 'parent']]
+      }
+    ],
+    'no-console': 'warn'
+  },
+  settings: {
+    react: {
+      version: 'detect'
+    }
+  }
+};
+</code></pre>
+
+<p><code>package.json</code> を編集します。</p>
+
+<pre><code class="language-json">{
+  &quot;scripts&quot;: {
+    ...
+    &quot;test&quot;
+    &quot;fmt&quot;: &quot;prettier --write src/**/*.{js,jsx,ts,tsx}&quot;,
+    &quot;lint&quot;: &quot;eslint --fix src/**/*.{js,jsx,ts,tsx}&quot;
+  },
+  ...
+  &quot;husky&quot;: {
+    &quot;hooks&quot;: {
+      &quot;pre-commit&quot;: &quot;npm run fmt &amp;&amp; npm run lint &amp;&amp; npm run test&quot;
+    }
+  }
+}
+</code></pre>
+
+<h2 id="manifest-file">Manifest File</h2>
+
+<hr />
+
+<p>Chrome 拡張には Manifest File が必要です。
+拡張機能の名前と説明、使用する API のパーミッションの設定などを .json ファイルとして記述します。
+<code>public/manifest.json</code> を以下の内容に書き換えます。</p>
+
+<pre><code class="language-json">{
+  &quot;manifest_version&quot;: 2,
+  &quot;version&quot;: &quot;0.0.1&quot;,
+  &quot;name&quot;: &quot;アプリ名&quot;,
+  &quot;short_name&quot;: &quot;12文字以内のアプリ名&quot;,
+  &quot;description&quot;: &quot;アプリ説明文&quot;,
+  &quot;icons&quot;: {
+    &quot;16&quot;: &quot;icon16.png&quot;,
+    &quot;48&quot;: &quot;icon48.png&quot;,
+    &quot;128&quot;: &quot;icon128.png&quot;
+  },
+  &quot;browser_action&quot;: {
+    &quot;default_icon&quot;: {
+      &quot;16&quot;: &quot;icon16.png&quot;,
+      &quot;48&quot;: &quot;icon48.png&quot;,
+      &quot;128&quot;: &quot;icon128.png&quot;
+    },
+    &quot;default_title&quot;: &quot;worklog&quot;,
+    &quot;default_popup&quot;: &quot;index.html&quot;
+  }
+}
+</code></pre>
+
+<p>Manifest File の内容に合わせて icon も <code>public/</code> 内に用意しておいてください。</p>
+
+<h2 id="ビルド">ビルド</h2>
+
+<hr />
+
+<p>以下のコマンドを実行してプロジェクトをビルドします。<br />
+すると <code>build/</code> 以下にファイルが生成されます。</p>
+
+<pre><code>$ yarn build
+</code></pre>
+
+<h2 id="chrome-にビルドした拡張機能の読み込み">Chrome にビルドした拡張機能の読み込み</h2>
+
+<hr />
+
+<ol>
+<li>chrome://extensions/ にアクセス</li>
+<li>[デベロッパーモード]を ON</li>
+<li>[パッケージ化されていない拡張機能を読み込む]をクリック</li>
+<li><code>build/</code> ディレクトリを選択</li>
+</ol>
+
+<p>するとツールバーにアイコンが表示されるのですが、クリックしてもポップアップには何も表示されません。<br />
+原因は <code>&lt;script&gt;</code> タグで JS がインライン展開されているため、CSP(Content Security Policy) に違反しているためです。<br />
+解決するために <code>.env</code> ファイルをルートフォルダに作成して以下を書き込みます。</p>
+
+<pre><code>INLINE_RUNTIME_CHUNK=false
+</code></pre>
+
+<p>そして <code>yarn build</code> し直して、拡張機能を読み込めば完了です。</p>
+
+<h2 id="テスト">テスト</h2>
+
+<hr />
+
+<p>テスト環境を構築します。<br />
+create-react-app でプロジェクトを作成するとデフォルト Jest がインストールされるので、 <code>enzyme</code> というパッケージを追加でインストールすることで、React でのテストが容易になります。</p>
+
+<pre><code>$ yarn add -D @types/enzyme @types/enzyme-adapter-react-16 enzyme enzyme-adapter-react-16
+</code></pre>
+
+<p>このまま書き始めると Adapter が有効にならないので <code>src/setupTests.ts</code> ファイルを作成して以下を書き込みます。</p>
+
+<pre><code class="language-ts">import Adapter from 'enzyme-adapter-react-16';
+import Enzyme from 'enzyme';
+
+Enzyme.configure({ adapter: new Adapter() });
+</code></pre>
+
+<p>そして <code>src/App.test.tsx</code> に簡単なテストを書きます。</p>
+
+<pre><code class="language-tsx">import { shallow } from 'enzyme';
+import App from './App';
+
+test('There is a string &quot;Welcom to React&quot;', () =&gt; {
+  const wrapper = shallow(&lt;App /&gt;);
+  expect(wrapper.text()).toContain('Welcom to React');
+});
+</code></pre>
+
+<pre><code>$ yarn test
+</code></pre>
+
+<p>テストを実行して通れば OK です。</p>
+
+<p>長くなったので、一旦ここで締めます。<br />
+実際の開発は次回の<a href="">開発編</a>で説明したいと思います。</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+                <p>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://yusei-wy.github.io/tags/chrome%E6%8B%A1%E5%BC%B5">Chrome拡張</a></span><span class="tag"><a href="https://yusei-wy.github.io/tags/create-react-app">create-react-app</a></span><span class="tag"><a href="https://yusei-wy.github.io/tags/react">React</a></span><span class="tag"><a href="https://yusei-wy.github.io/tags/typescript">TypeScript</a></span>
+                </p>
+
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1203 Words</p>
+
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-08-17 12:09 &#43;0900</p>
+                <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="71d2fb813269ace8ede001dec360c8d39f81ac95" target="_blank" rel="noopener">71d2fb8</a> @ 2019-08-24</p>
+        </div>
+
+        
+            <div class="pagination">
+                <div class="pagination__title">
+                    <span class="pagination__title-h"></span>
+                    <hr />
+                </div>
+
+                <div class="pagination__buttons">
+                    
+
+                    
+                        <span class="button next">
+                            <a href="https://yusei-wy.github.io/posts/state-pattern/">
+                                <span class="button__text">State パターン</span>
+                                <span class="button__icon">→</span>
+                            </a>
+                        </span>
+                    
+                </div>
+            </div>
+        
+
+        
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>&copy; 2019</span>
+            
+            <span></span>
+            <span> <a href="https://yusei-wy.github.io/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+
+        </div>
+    </div>
+    <div class="footer__inner">
+        <div class="footer__content">
+            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
+            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
+        </div>
+    </div>
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+
+<script type="text/javascript" src="https://yusei-wy.github.io/bundle.min.cf7871ed49474a80ed457154d24e61f7881adbe0f9384951a74ac46b688a39a4dbfa68bc6d37baeb058186de354ead3487d4ee7f083ea4cba860c48600b694f3.js" integrity="sha512-z3hx7UlHSoDtRXFU0k5h94ga2&#43;D5OElRp0rEa2iKOaTb&#43;mi8bTe66wWBht41Tq00h9Tufwg&#43;pMuoYMSGALaU8w=="></script>
+
+
+
+    </body>
+</html>
