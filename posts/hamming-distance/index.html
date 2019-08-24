@@ -1,134 +1,103 @@
 <!DOCTYPE html>
-<html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="author"
-    content="">
-<meta name="description"
-    content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&amp;r" />
-<meta name="keywords" content="" />
-<meta name="robots" content="noodp" />
-<link rel="canonical" href="https://yusei-wy.github.io/posts/hamming-distance/" />
-
-
-<title>
+<html>
+  <head>
     
-    ハミング距離 :: Hacker Blog 
     
-</title>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      
+  ハミング距離 &ndash; Hacker Blog
+
+    </title>
+    
+    
+    <meta name="description" property="og:description" content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&amp;r|">
+    
+
+    <meta name="apple-mobile-web-app-title" content="Hacker Blog">
+    
+    
+    
+    
 
 
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.1/css/flag-icon.min.css" rel="stylesheet"
-    type="text/css">
-
-
-
-<link rel="stylesheet" href="https://yusei-wy.github.io/main.min.6a7678f40434c7781747ffdd224a984179b2a3c81c81f19ccf845fdffbe80b7c.css">
+    <link rel="stylesheet" href="https://yusei-wy.github.io/assets/syntax.css">
+    <link rel="stylesheet" href="https://yusei-wy.github.io/assets/primer-build.css">
+    <link rel="stylesheet" href="https://yusei-wy.github.io/assets/style.css">
+  </head>
 
 
+  <body class="bg-gray">
+    <div id="holy" class="container-lg bg-white h-100">
 
-<link rel="apple-touch-icon" sizes="180x180" href="https://yusei-wy.github.io/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://yusei-wy.github.io/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="https://yusei-wy.github.io/favicon-16x16.png">
-<link rel="manifest" href="https://yusei-wy.github.io/site.webmanifest">
-<link rel="mask-icon" href="https://yusei-wy.github.io/safari-pinned-tab.svg" color="#252627">
-<link rel="shortcut icon" href="https://yusei-wy.github.io/favicon.ico">
-<meta name="theme-color" content="#252627">
-<meta itemprop="name" content="ハミング距離">
-<meta itemprop="description" content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&r">
+      <div id="header" class="px-1 bg-white">
+        <nav class="UnderlineNav UnderlineNav--right px-2">
+  <a class="UnderlineNav-actions muted-link h2" href="https://yusei-wy.github.io/">
+    Hacker Blog
+  </a>
 
+  
+  
+  <div class="UnderlineNav-body">
+    
+    
+    <a class="UnderlineNav-item " href="https://yusei-wy.github.io/about">
+      
+      <span>About</span>
+    </a>
+    
+    
+    
+    <a class="UnderlineNav-item " href="https://yusei-wy.github.io/posts">
+      
+      <span>Blog</span>
+    </a>
+    
+    
+  </div>
+  
+</nav>
 
-<meta itemprop="datePublished" content="2019-04-16T20:08:32&#43;09:00" />
-<meta itemprop="dateModified" content="2019-08-24T17:48:14&#43;09:00" />
-<meta itemprop="wordCount" content="180">
+      </div>
 
-
-
-<meta itemprop="keywords" content="アルゴリズム," />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="ハミング距離"/>
-<meta name="twitter:description" content="ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&r"/>
-
-
-
-
-<meta property="article:published_time" content="2019-04-16 20:08:32 &#43;0900 JST" />
-
-
-
-
-
-
-
-    </head>
-
-    <body class="">
-        <div class="container">
-            <header class="header">
-    <span class="header__inner">
-        <a href="https://yusei-wy.github.io/" style="text-decoration: none;">
-    <div class="logo">
+      <div role="main" id="main" class="holy-main markdown-body px-4 bg-white">
         
-            <span class="logo__mark">></span>
-            <span class="logo__text">hello</span>
-            <span class="logo__cursor"></span>
-        
-    </div>
+
+<div class="Subhead">
+  <div class="Subhead-heading">
+    <div class="h1 mt-3 mb-1">ハミング距離</div>
+  </div>
+  <div class="Subhead-description">
+    
+
+
+
+
+<a href='https://yusei-wy.github.io/tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0' class="muted-link">
+  <span class="Label Label--gray">アルゴリズム</span>
 </a>
 
 
-        <span class="header__right">
-            
-                <nav class="menu">
-    <ul class="menu__inner"><li><a href="https://yusei-wy.github.io/about">About</a></li><li><a href="https://yusei-wy.github.io/posts">Blog</a></li>
-    </ul>
-</nav>
 
-                <span class="menu-trigger">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                    </svg>
-                </span>
-            
-
-            <span class="theme-toggle"><svg class="theme-toggler" width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
-  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
-  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"/>
-</svg>
-</span>
-        </span>
-    </span>
-</header>
-
-
-            <div class="content">
-                
-    <main class="post">
-
-        <div class="post-info">
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>1 minutes
-
-            
-
-            </p>
-        </div>
-
-        <article>
-            <h1 class="post-title"><a href="https://yusei-wy.github.io/posts/hamming-distance/">ハミング距離</a></h1>
-
-            
-
-            <div class="post-content">
-                
+    
+    <div class="float-md-right">
+      <span title="Lastmod: 2019-08-24. Published at: 2019-04-16.">
+        
+          Lastmod: 2019-08-24
+        
+      </span>
+    </div>
+    
+  </div>
+</div>
+<article>
+  
+  <section class="pb-6 mb-3 border-bottom">
+    
 
 <h2 id="ハミング距離とは">ハミング距離とは</h2>
-
-<hr />
 
 <blockquote>
 <p>等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数
@@ -157,8 +126,6 @@ hollndorld
 
 <h2 id="求め方">求め方</h2>
 
-<hr />
-
 <p>ソースコードで表すと</p>
 
 <pre><code class="language-python">str1 = &quot;1001001&quot;
@@ -173,90 +140,63 @@ print(cnt)  # 2
 
 <p>簡単ですね。</p>
 
-            </div>
-        </article>
+  </section>
 
-        <hr />
+  <section>
+    
+      
+    
+  </section>
+</article>
 
-        <div class="post-info">
-                <p>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://yusei-wy.github.io/tags/%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0">アルゴリズム</a></span>
-                </p>
+      </div>
 
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>180 Words</p>
-
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-04-16 20:08 &#43;0900</p>
-                <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="71d2fb813269ace8ede001dec360c8d39f81ac95" target="_blank" rel="noopener">71d2fb8</a> @ 2019-08-24</p>
-        </div>
-
-        
-            <div class="pagination">
-                <div class="pagination__title">
-                    <span class="pagination__title-h"></span>
-                    <hr />
-                </div>
-
-                <div class="pagination__buttons">
-                    
-                        <span class="button previous">
-                            <a href="https://yusei-wy.github.io/posts/state-pattern/">
-                                <span class="button__icon">←</span>
-                                <span class="button__text">State パターン</span>
-                            </a>
-                        </span>
-                    
-
-                    
-                        <span class="button next">
-                            <a href="https://yusei-wy.github.io/posts/firstpost/">
-                                <span class="button__text">ブログ始めました</span>
-                                <span class="button__icon">→</span>
-                            </a>
-                        </span>
-                    
-                </div>
-            </div>
-        
-
-        
-    </main>
-
-            </div>
-
-            
-                <footer class="footer">
-    <div class="footer__inner">
-        <div class="footer__content">
-            <span>&copy; 2019</span>
-            
-            <span></span>
-            <span> <a href="https://yusei-wy.github.io/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a></span>
-        </div>
+      <div id="side" class="pr-1 bg-white">
+        <aside class="pr-3">
+          
+  
+    <div id="toc" class="Box Box--blue mb-3">
+      <b>ハミング距離</b>
+      <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#ハミング距離とは">ハミング距離とは</a></li>
+<li><a href="#求め方">求め方</a></li>
+</ul></li>
+</ul>
+</nav>
     </div>
-    <div class="footer__inner">
-        <div class="footer__content">
+  
 
-        </div>
+  
+    <div>
+      
     </div>
-    <div class="footer__inner">
-        <div class="footer__content">
-            <span>Powered by <a href="http://gohugo.io">Hugo</a></span>
-            <span>Made with &#10084; by <a href="https://github.com/rhazdon">rhazdon</a></span>
-        </div>
-    </div>
-</footer>
+  
 
-            
-        </div>
+        </aside>
+      </div>
 
+      <div id="footer" class="pt-2 pb-3 bg-white text-center">
         
 
+  <span class="text-small text-gray">
+    
+
+    Powered by the
+    <a href="https://github.com/qqhann/hugo-primer" class="link-gray-dark">Hugo-Primer</a> theme for
+    <a href="https://gohugo.io" class="link-gray-dark">Hugo</a>.
+  </span>
 
 
+      </div>
+    </div>
 
-<script type="text/javascript" src="https://yusei-wy.github.io/bundle.min.cf7871ed49474a80ed457154d24e61f7881adbe0f9384951a74ac46b688a39a4dbfa68bc6d37baeb058186de354ead3487d4ee7f083ea4cba860c48600b694f3.js" integrity="sha512-z3hx7UlHSoDtRXFU0k5h94ga2&#43;D5OElRp0rEa2iKOaTb&#43;mi8bTe66wWBht41Tq00h9Tufwg&#43;pMuoYMSGALaU8w=="></script>
 
-
-
-    </body>
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({ tex2jax: { inlineMath: [['$','$'], ['\\(','\\)']] } });</script>
+  </body>
 </html>
