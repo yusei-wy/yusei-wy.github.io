@@ -1,0 +1,29 @@
+baseURL = "https://yusei-wy.github.io/"
+title = "Hacker Blog"
+author = "yusei-wy"
+canonifyurls = true
+paginate = 3
+theme = "hello-friend-ng"
+hasCJKLanguage = true
+DefaultContentLanguage = "ja"
+defaultContentLanguageInSubdir = true
+languageCode = "ja"
+enableGitInfo = true
+
+[params]
+  # Directory name of your blog content (default is `content/posts`)
+  contentTypeName = "posts"
+  # Default theme "light" or "dark"
+  defaultTheme = "light"
+
+# And you can even create generic menu
+[menu]
+  [[menu.main]]
+    identifier = "about"
+    name = "About"
+    url = "/about"
+
+  [[menu.main]]
+    identifier = "blog"
+    name = "Blog"
+    url = "/posts"
