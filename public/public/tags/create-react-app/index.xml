@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>create-react-app on Hacker Blog</title>
+    <link>https://yusei-wy.github.io/tags/create-react-app/</link>
+    <description>Recent content in create-react-app on Hacker Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sat, 17 Aug 2019 12:09:50 +0900</lastBuildDate>
+    
+	<atom:link href="https://yusei-wy.github.io/tags/create-react-app/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>WorkLog① - Chrome 拡張の環境構築</title>
+      <link>https://yusei-wy.github.io/posts/worklog01/</link>
+      <pubDate>Sat, 17 Aug 2019 12:09:50 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/posts/worklog01/</guid>
+      <description>業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。 なのである程度自動化しよう</description>
+    </item>
+    
+  </channel>
+</rss>

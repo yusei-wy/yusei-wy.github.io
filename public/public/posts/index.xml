@@ -1,0 +1,340 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on Hacker Blog</title>
+        <link>https://yusei-wy.github.io/posts/</link>
+        <description>Recent content in Posts on Hacker Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>ja</language>
+        <lastBuildDate>Sat, 17 Aug 2019 12:09:50 +0900</lastBuildDate>
+        <atom:link href="https://yusei-wy.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>WorkLog① - Chrome 拡張の環境構築</title>
+            <link>https://yusei-wy.github.io/posts/worklog01/</link>
+            <pubDate>Sat, 17 Aug 2019 12:09:50 +0900</pubDate>
+            
+            <guid>https://yusei-wy.github.io/posts/worklog01/</guid>
+            <description>業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。 なのである程度自動化しよう</description>
+            <content type="html"><![CDATA[
+
+<p>業務でタスクにかかった時間をまとめて提出するのですが、テキストファイルで管理するのは面倒。あとで集計するのも面倒。<br />
+なのである程度自動化しようと思い、ツールを開発することにしました。</p>
+
+<p>デスクトップアプリでは時間がかかりそうだったので、Chrome の拡張機能としてパパっと開発することにしました。</p>
+
+<p>基本的には以下のページを参考にしています。<br />
+<a href="https://medium.com/better-programming/create-a-chrome-extension-using-react-and-typescript-50e94e14320c">https://medium.com/better-programming/create-a-chrome-extension-using-react-and-typescript-50e94e14320c</a></p>
+
+<h2 id="プロジェクトの作成">プロジェクトの作成</h2>
+
+<hr />
+
+<p>React と TypeScript を使って拡張機能を開発するので、必要なパッケージをインストールしプロジェクトを作成します。</p>
+
+<pre><code>$ npm i -g create-react-app
+$ create-react-app my-app --typescript
+$ cd my-app
+</code></pre>
+
+<h2 id="エラーチェックとフォーマット">エラーチェックとフォーマット</h2>
+
+<hr />
+
+<p>エラーチェックとコードフォーマットのために eslint と prettier をインストールします。</p>
+
+<pre><code>$ yarn add -D husky lint-staged prettier eslint eslint-plugin-react eslint-plugin-prettier eslint-config-prettier eslint-plugin-import @typescript-eslint/{parser,eslint-plugin}
+</code></pre>
+
+<p><code>.eslintrc.js</code> ファイルを作成しエラーチェックとコードフォーマットを有効化します。</p>
+
+<pre><code class="language-js">module.exports = {
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
+    jest: true
+  },
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module'
+  },
+  plugins: ['import', 'prettier', 'react'],
+  rules: {
+    'prettier/prettier': [
+      'error',
+      {
+        semi: true,
+        singleQuote: true,
+        printWidth: 120,
+        tabWidth: 2
+      }
+    ],
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'off',
+      {
+        argsIgnorePattern: '^_'
+      }
+    ],
+    '@typescript-eslint/no-use-before-define': 'off',
+    // ordered-imports - tslint
+    'import/order': [
+      'error',
+      {
+        groups: [['external', 'builtin'], ['internal', 'index', 'sibling', 'parent']]
+      }
+    ],
+    'no-console': 'warn'
+  },
+  settings: {
+    react: {
+      version: 'detect'
+    }
+  }
+};
+</code></pre>
+
+<p><code>package.json</code> を編集します。</p>
+
+<pre><code class="language-json">{
+  &quot;scripts&quot;: {
+    ...
+    &quot;test&quot;
+    &quot;fmt&quot;: &quot;prettier --write src/**/*.{js,jsx,ts,tsx}&quot;,
+    &quot;lint&quot;: &quot;eslint --fix src/**/*.{js,jsx,ts,tsx}&quot;
+  },
+  ...
+  &quot;husky&quot;: {
+    &quot;hooks&quot;: {
+      &quot;pre-commit&quot;: &quot;npm run fmt &amp;&amp; npm run lint &amp;&amp; npm run test&quot;
+    }
+  }
+}
+</code></pre>
+
+<h2 id="manifest-file">Manifest File</h2>
+
+<hr />
+
+<p>Chrome 拡張には Manifest File が必要です。
+拡張機能の名前と説明、使用する API のパーミッションの設定などを .json ファイルとして記述します。
+<code>public/manifest.json</code> を以下の内容に書き換えます。</p>
+
+<pre><code class="language-json">{
+  &quot;manifest_version&quot;: 2,
+  &quot;version&quot;: &quot;0.0.1&quot;,
+  &quot;name&quot;: &quot;アプリ名&quot;,
+  &quot;short_name&quot;: &quot;12文字以内のアプリ名&quot;,
+  &quot;description&quot;: &quot;アプリ説明文&quot;,
+  &quot;icons&quot;: {
+    &quot;16&quot;: &quot;icon16.png&quot;,
+    &quot;48&quot;: &quot;icon48.png&quot;,
+    &quot;128&quot;: &quot;icon128.png&quot;
+  },
+  &quot;browser_action&quot;: {
+    &quot;default_icon&quot;: {
+      &quot;16&quot;: &quot;icon16.png&quot;,
+      &quot;48&quot;: &quot;icon48.png&quot;,
+      &quot;128&quot;: &quot;icon128.png&quot;
+    },
+    &quot;default_title&quot;: &quot;worklog&quot;,
+    &quot;default_popup&quot;: &quot;index.html&quot;
+  }
+}
+</code></pre>
+
+<p>Manifest File の内容に合わせて icon も <code>public/</code> 内に用意しておいてください。</p>
+
+<h2 id="ビルド">ビルド</h2>
+
+<hr />
+
+<p>以下のコマンドを実行してプロジェクトをビルドします。<br />
+すると <code>build/</code> 以下にファイルが生成されます。</p>
+
+<pre><code>$ yarn build
+</code></pre>
+
+<h2 id="chrome-にビルドした拡張機能の読み込み">Chrome にビルドした拡張機能の読み込み</h2>
+
+<hr />
+
+<ol>
+<li>chrome://extensions/ にアクセス</li>
+<li>[デベロッパーモード]を ON</li>
+<li>[パッケージ化されていない拡張機能を読み込む]をクリック</li>
+<li><code>build/</code> ディレクトリを選択</li>
+</ol>
+
+<p>するとツールバーにアイコンが表示されるのですが、クリックしてもポップアップには何も表示されません。<br />
+原因は <code>&lt;script&gt;</code> タグで JS がインライン展開されているため、CSP(Content Security Policy) に違反しているためです。<br />
+解決するために <code>.env</code> ファイルをルートフォルダに作成して以下を書き込みます。</p>
+
+<pre><code>INLINE_RUNTIME_CHUNK=false
+</code></pre>
+
+<p>そして <code>yarn build</code> し直して、拡張機能を読み込めば完了です。</p>
+
+<h2 id="テスト">テスト</h2>
+
+<hr />
+
+<p>テスト環境を構築します。<br />
+create-react-app でプロジェクトを作成するとデフォルト Jest がインストールされるので、 <code>enzyme</code> というパッケージを追加でインストールすることで、React でのテストが容易になります。</p>
+
+<pre><code>$ yarn add -D @types/enzyme @types/enzyme-adapter-react-16 enzyme enzyme-adapter-react-16
+</code></pre>
+
+<p>このまま書き始めると Adapter が有効にならないので <code>src/setupTests.ts</code> ファイルを作成して以下を書き込みます。</p>
+
+<pre><code class="language-ts">import Adapter from 'enzyme-adapter-react-16';
+import Enzyme from 'enzyme';
+
+Enzyme.configure({ adapter: new Adapter() });
+</code></pre>
+
+<p>そして <code>src/App.test.tsx</code> に簡単なテストを書きます。</p>
+
+<pre><code class="language-tsx">import { shallow } from 'enzyme';
+import App from './App';
+
+test('There is a string &quot;Welcom to React&quot;', () =&gt; {
+  const wrapper = shallow(&lt;App /&gt;);
+  expect(wrapper.text()).toContain('Welcom to React');
+});
+</code></pre>
+
+<pre><code>$ yarn test
+</code></pre>
+
+<p>テストを実行して通れば OK です。</p>
+
+<p>長くなったので、一旦ここで締めます。<br />
+実際の開発は次回の<a href="">開発編</a>で説明したいと思います。</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>State パターン</title>
+            <link>https://yusei-wy.github.io/posts/state-pattern/</link>
+            <pubDate>Fri, 07 Jun 2019 19:28:31 +0900</pubDate>
+            
+            <guid>https://yusei-wy.github.io/posts/state-pattern/</guid>
+            <description>最近は『 リファクタリング 既存のコードを安全に改善する 』という本を読んでいます。 第 1 章で説明されていた State パターンについてのメモです。 State パターン</description>
+            <content type="html"><![CDATA[
+
+<p>最近は『
+<a href="https://www.amazon.co.jp/dp/B01IGW5MG0/ref=dp-kindle-redirect?_encoding=UTF8&amp;btkr=1" target="_blank" rel="noopener noreferrer">リファクタリング　既存のコードを安全に改善する</a>
+
+』という本を読んでいます。<br />
+第 1 章で説明されていた State パターンについてのメモです。</p>
+
+<h2 id="state-パターン-state-pattern-ステート-パターン-とは">State パターン（state pattern, ステート・パターン）とは</h2>
+
+<hr />
+
+<p>一般的なオブジェクト指向のプログラミング言語では、オブジェクトは自分が属するクラスを生存期間中に変更できない。
+この解決策が State パターン。</p>
+
+<blockquote>
+<p>プログラミングで用いられる振る舞いに関する（英語版） デザインパターンの一種である。このパターンはオブジェクトの状態（state）を表現するために用いられる。ランタイムでそのタイプを部分的に変化させるオブジェクトを扱うクリーンな手段となる<br />
+出典：<a href="https://ja.wikipedia.org/wiki/State_%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">State パターン</a></p>
+</blockquote>
+
+<p>例えば</p>
+
+<p>{{&lt; mermaid align=&ldquo;left&rdquo; &gt;}}
+sequenceDiagram
+participant Alice
+participant Bob
+Alice-&gt;&gt;John: Hello John, how are you?
+loop Healthcheck
+John-&gt;John: Fight against hypochondria
+end
+Note right of John: Rational thoughts <br/>prevail&hellip;
+John&ndash;&gt;Alice: Great!
+John-&gt;Bob: How about you?
+Bob&ndash;&gt;John: Jolly good!
+{{&lt; /mermaid &gt;}}</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>ハミング距離</title>
+            <link>https://yusei-wy.github.io/posts/hamming-distance/</link>
+            <pubDate>Tue, 16 Apr 2019 20:08:32 +0900</pubDate>
+            
+            <guid>https://yusei-wy.github.io/posts/hamming-distance/</guid>
+            <description>ハミング距離とは 等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数 出典：ハミング距離 例えば 1001001 1000101 このハミング距離は&amp;r</description>
+            <content type="html"><![CDATA[
+
+<h2 id="ハミング距離とは">ハミング距離とは</h2>
+
+<hr />
+
+<blockquote>
+<p>等しい文字数を持つ二つの文字列の中で、対応する位置にある異なった文字の個数
+出典：<a href="https://ja.wikipedia.org/wiki/%E3%83%8F%E3%83%9F%E3%83%B3%E3%82%B0%E8%B7%9D%E9%9B%A2">ハミング距離</a></p>
+</blockquote>
+
+<p>例えば</p>
+
+<pre><code>1001001
+1000101
+</code></pre>
+
+<p>このハミング距離は&rdquo;2&rdquo;</p>
+
+<pre><code>2239567
+2459587
+</code></pre>
+
+<p>このハミング距離は&rdquo;3&rdquo;</p>
+
+<pre><code>helloworld
+hollndorld
+</code></pre>
+
+<p>このハミング距離は&rdquo;3&rdquo;</p>
+
+<h2 id="求め方">求め方</h2>
+
+<hr />
+
+<p>ソースコードで表すと</p>
+
+<pre><code class="language-python">str1 = &quot;1001001&quot;
+str2 = &quot;1000101&quot;
+
+cnt = 0
+for s1, s2 in zip(list(str1), list(str2)):
+    if s1 is not s2:
+        cnt += 1
+print(cnt)  # 2
+</code></pre>
+
+<p>簡単ですね。</p>
+]]></content>
+        </item>
+        
+        <item>
+            <title>ブログ始めました</title>
+            <link>https://yusei-wy.github.io/posts/firstpost/</link>
+            <pubDate>Sun, 14 Apr 2019 15:52:26 +0900</pubDate>
+            
+            <guid>https://yusei-wy.github.io/posts/firstpost/</guid>
+            <description>はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo</description>
+            <content type="html"><![CDATA[<p>はじめまして。yusei です。今まで自作のブログサイトを作ろうと思っては面倒になって完成せずいつになっても始まらなかったので、自作は諦めて Hugo でブログを書くことにしました。</p>
+
+<p>記事の内容は今勉強しているアルゴリズムについてや個人プロジェクトのことについて書いていこうと思います。</p>
+
+<p>ではよろしくお願いします。</p>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>
