@@ -45,7 +45,7 @@ $ cd my-app
 <pre><code>$ yarn add -D husky lint-staged prettier eslint eslint-plugin-react eslint-plugin-prettier eslint-config-prettier eslint-plugin-import @typescript-eslint/{parser,eslint-plugin}
 </code></pre>
 
-<p><code>.eslintrc.js</code> ファイルを作成しエラーチェックとフォーマットを有向化します。</p>
+<p><code>.eslintrc.js</code> ファイルを作成しエラーチェックとコードフォーマットを有効化します。</p>
 
 <pre><code class="language-js">module.exports = {
   env: {
@@ -54,7 +54,7 @@ $ cd my-app
     node: true,
     jest: true
   },
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true
@@ -73,7 +73,14 @@ $ cd my-app
         tabWidth: 2
       }
     ],
-    'react/jsx-no-target-blank': 'error',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'off',
+      {
+        argsIgnorePattern: '^_'
+      }
+    ],
+    '@typescript-eslint/no-use-before-define': 'off',
     // ordered-imports - tslint
     'import/order': [
       'error',
@@ -81,15 +88,22 @@ $ cd my-app
         groups: [['external', 'builtin'], ['internal', 'index', 'sibling', 'parent']]
       }
     ],
-    // 'sort-imports': 'error',
-    'no-console': 'error'
+    'no-console': 'warn'
+  },
+  settings: {
+    react: {
+      version: 'detect'
+    }
   }
 };
 </code></pre>
 
+<p><code>package.json</code> を編集します。</p>
+
 <pre><code class="language-json">{
   &quot;scripts&quot;: {
     ...
+    &quot;test&quot;
     &quot;fmt&quot;: &quot;prettier --write src/**/*.{js,jsx,ts,tsx}&quot;,
     &quot;lint&quot;: &quot;eslint --fix src/**/*.{js,jsx,ts,tsx}&quot;
   },
@@ -108,7 +122,7 @@ $ cd my-app
 
 <p>Chrome 拡張には Manifest File が必要です。
 拡張機能の名前と説明、使用する API のパーミッションの設定などを .json ファイルとして記述します。
-<code>public/mmanifest.json</code> を以下の内容に書き換えます。</p>
+<code>public/manifest.json</code> を以下の内容に書き換えます。</p>
 
 <pre><code class="language-json">{
   &quot;manifest_version&quot;: 2,
@@ -172,10 +186,10 @@ $ cd my-app
 <p>テスト環境を構築します。<br />
 create-react-app でプロジェクトを作成するとデフォルト Jest がインストールされるので、 <code>enzyme</code> というパッケージを追加でインストールすることで、React でのテストが容易になります。</p>
 
-<pre><code>yarn add -D @types/enzyme @types/enzyme-adapter-react-16 enzyme enzyme-adapter-react-16
+<pre><code>$ yarn add -D @types/enzyme @types/enzyme-adapter-react-16 enzyme enzyme-adapter-react-16
 </code></pre>
 
-<p>このまま書き始めると Adapter が有向にならないので <code>src/setupTests.ts</code> ファイルを作成して以下を書き込みます。</p>
+<p>このまま書き始めると Adapter が有効にならないので <code>src/setupTests.ts</code> ファイルを作成して以下を書き込みます。</p>
 
 <pre><code class="language-ts">import Adapter from 'enzyme-adapter-react-16';
 import Enzyme from 'enzyme';

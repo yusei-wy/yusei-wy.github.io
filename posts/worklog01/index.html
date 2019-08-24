@@ -42,8 +42,8 @@
 
 
 <meta itemprop="datePublished" content="2019-08-17T12:09:50&#43;09:00" />
-<meta itemprop="dateModified" content="2019-08-17T12:09:50&#43;09:00" />
-<meta itemprop="wordCount" content="1174">
+<meta itemprop="dateModified" content="2019-08-18T13:01:42&#43;09:00" />
+<meta itemprop="wordCount" content="1203">
 
 
 
@@ -154,7 +154,7 @@ $ cd my-app
 <pre><code>$ yarn add -D husky lint-staged prettier eslint eslint-plugin-react eslint-plugin-prettier eslint-config-prettier eslint-plugin-import @typescript-eslint/{parser,eslint-plugin}
 </code></pre>
 
-<p><code>.eslintrc.js</code> ファイルを作成しエラーチェックとフォーマットを有向化します。</p>
+<p><code>.eslintrc.js</code> ファイルを作成しエラーチェックとコードフォーマットを有効化します。</p>
 
 <pre><code class="language-js">module.exports = {
   env: {
@@ -163,7 +163,7 @@ $ cd my-app
     node: true,
     jest: true
   },
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:@typescript-eslint/recommended'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true
@@ -182,7 +182,14 @@ $ cd my-app
         tabWidth: 2
       }
     ],
-    'react/jsx-no-target-blank': 'error',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'off',
+      {
+        argsIgnorePattern: '^_'
+      }
+    ],
+    '@typescript-eslint/no-use-before-define': 'off',
     // ordered-imports - tslint
     'import/order': [
       'error',
@@ -190,15 +197,22 @@ $ cd my-app
         groups: [['external', 'builtin'], ['internal', 'index', 'sibling', 'parent']]
       }
     ],
-    // 'sort-imports': 'error',
-    'no-console': 'error'
+    'no-console': 'warn'
+  },
+  settings: {
+    react: {
+      version: 'detect'
+    }
   }
 };
 </code></pre>
 
+<p><code>package.json</code> を編集します。</p>
+
 <pre><code class="language-json">{
   &quot;scripts&quot;: {
     ...
+    &quot;test&quot;
     &quot;fmt&quot;: &quot;prettier --write src/**/*.{js,jsx,ts,tsx}&quot;,
     &quot;lint&quot;: &quot;eslint --fix src/**/*.{js,jsx,ts,tsx}&quot;
   },
@@ -217,7 +231,7 @@ $ cd my-app
 
 <p>Chrome 拡張には Manifest File が必要です。
 拡張機能の名前と説明、使用する API のパーミッションの設定などを .json ファイルとして記述します。
-<code>public/mmanifest.json</code> を以下の内容に書き換えます。</p>
+<code>public/manifest.json</code> を以下の内容に書き換えます。</p>
 
 <pre><code class="language-json">{
   &quot;manifest_version&quot;: 2,
@@ -281,10 +295,10 @@ $ cd my-app
 <p>テスト環境を構築します。<br />
 create-react-app でプロジェクトを作成するとデフォルト Jest がインストールされるので、 <code>enzyme</code> というパッケージを追加でインストールすることで、React でのテストが容易になります。</p>
 
-<pre><code>yarn add -D @types/enzyme @types/enzyme-adapter-react-16 enzyme enzyme-adapter-react-16
+<pre><code>$ yarn add -D @types/enzyme @types/enzyme-adapter-react-16 enzyme enzyme-adapter-react-16
 </code></pre>
 
-<p>このまま書き始めると Adapter が有向にならないので <code>src/setupTests.ts</code> ファイルを作成して以下を書き込みます。</p>
+<p>このまま書き始めると Adapter が有効にならないので <code>src/setupTests.ts</code> ファイルを作成して以下を書き込みます。</p>
 
 <pre><code class="language-ts">import Adapter from 'enzyme-adapter-react-16';
 import Enzyme from 'enzyme';
@@ -321,9 +335,10 @@ test('There is a string &quot;Welcom to React&quot;', () =&gt; {
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="https://yusei-wy.github.io/tags/chrome%E6%8B%A1%E5%BC%B5">Chrome拡張</a></span><span class="tag"><a href="https://yusei-wy.github.io/tags/create-react-app">create-react-app</a></span><span class="tag"><a href="https://yusei-wy.github.io/tags/react">React</a></span><span class="tag"><a href="https://yusei-wy.github.io/tags/typescript">TypeScript</a></span>
                 </p>
 
-            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1174 Words</p>
+            <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1203 Words</p>
 
             <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-08-17 12:09 &#43;0900</p>
+                <p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-git-commit"><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></svg><a href="d8f629c310ae98b722be94d6e4985fa8ff9b783c" target="_blank" rel="noopener">d8f629c</a> @ 2019-08-18</p>
         </div>
 
         
