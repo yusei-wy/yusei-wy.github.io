@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>getters on Hacker Blog</title>
+    <link>https://yusei-wy.github.io/tags/getters/</link>
+    <description>Recent content in getters on Hacker Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>ja</language>
+    <lastBuildDate>Sat, 16 Nov 2019 19:48:57 +0900</lastBuildDate>
+    
+	<atom:link href="https://yusei-wy.github.io/tags/getters/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Vue Store の getter でクロージャーを使う方法</title>
+      <link>https://yusei-wy.github.io/posts/vue-store-getters-closure/</link>
+      <pubDate>Sat, 16 Nov 2019 19:48:57 +0900</pubDate>
+      
+      <guid>https://yusei-wy.github.io/posts/vue-store-getters-closure/</guid>
+      <description>Vue で Store の getter を書いているときに引数によって戻り値を変えたいときがある。 そんなときには以下の方法でデータを絞り込むことが可能だ。 vuex const getters = { getByID: (state) =&amp;gt;</description>
+    </item>
+    
+  </channel>
+</rss>
