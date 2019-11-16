@@ -101,7 +101,7 @@
     <div class="float-md-right">
       <span title="Lastmod: 2019-11-16. Published at: 2019-11-16.">
         
-          Published: 2019-11-16
+          Lastmod: 2019-11-16
         
       </span>
     </div>
@@ -121,12 +121,20 @@
 <pre><code class="language-ts">const getters = {
   getByID: (state) =&gt; (id: strig) =&gt; state.todos.find(t =&gt; t.id === id)
 }
+
+...
+
+this.$store.getters.getByID('123')
 </code></pre>
 
 <h2 id="vuex-compositoin-api">vuex-compositoin-api</h2>
 
 <pre><code class="language-ts">const state = reactive({ ... })
 const getByID = computed(() =&gt; (id: string) =&gt; state.todos.find(t =&gt; t.id === id))
+
+...
+
+getByID('123')
 </code></pre>
 
 <h2 id="参考">参考</h2>
