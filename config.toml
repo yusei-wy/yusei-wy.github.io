@@ -1,7 +1,7 @@
 # The URL the site will be built for
 base_url = "https://yusei-wy.github.io"
 
-title = "yusei-wy"
+title = "yusei-wy.github.io"
 description = ""
 
 default_language = "ja"
