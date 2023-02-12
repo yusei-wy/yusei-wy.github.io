@@ -8,5 +8,6 @@ build:
 
 deploy:
 	make build
-	git commit -m "deploy $()"
+	git add .
+	git commit -m "deploy $(DATETIME)"
 	git push -u origin main
