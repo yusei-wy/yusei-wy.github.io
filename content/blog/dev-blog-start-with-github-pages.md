@@ -45,3 +45,14 @@ GitHubPages にデプロイする手順
 
 以降は選択したブランチに push するだけで最新版が公開される。
 
+コミットメッセージを書くのが面倒であれば以下のような Makefile を書くと `make deploy` で stage, commit, deploy までできて便利です。
+
+```Makefile
+DATETIME = $(shell date "+%Y-%m-%d %H:%M:%S")
+
+deploy:
+	make build
+	git add .
+	git commit -m "deploy $(DATETIME)"
+	git push -u origin main
+```
