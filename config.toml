@@ -6,8 +6,7 @@ description = ""
 
 default_language = "ja"
 
-# TODO:
-# theme = ""
+theme = "shadharon"
 
 # For overriding the default output directory `public`, set it to another value (e.g.: "docs")
 output_dir = "docs"
