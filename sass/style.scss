@@ -1,0 +1,38 @@
+@import "variables";
+
+html {
+    font-size: 16px;
+}
+
+h2 {
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--light-border-color);
+}
+
+html,
+body,
+.base-container {
+    height: 100%;
+}
+
+.base-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.header {}
+
+.main {
+    flex-grow: 1;
+    min-height: initial;
+    width: 100%;
+
+}
+
+.footer {
+    margin-top: 0;
+}
+
+.home-title {
+    color: $primary;
+}

@@ -1,17 +1,23 @@
+{% import "macros/macros.html" as post_macros %}
+
 <!DOCTYPE html>
 <html lang="ja">
 
-<head>
-    <meta charset="utf-8">
-    <title>yusei-wy blog</title>
-</head>
+{% include "partials/head.html" %}
 
 <body>
-    <section class="section">
-        <div class="container">
-            {% block content %} {% endblock %}
-        </div>
-    </section>
+    <div class="base-container">
+        {% include "partials/nav.html" %}
+
+        <main class="main content">
+            {# Post page is the default #}
+            {% block content %}
+            Nothing here?!
+            {% endblock content %}
+        </main>
+
+        {% include "partials/footer.html" %}
+    </div>
 </body>
 
 </html>
