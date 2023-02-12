@@ -1,6 +1,7 @@
 +++
 title = "GitHub Pagesで始める開発ブログ"
 date = 2023-02-12
+tags = ["GitHub", "Zola", "Rust"]
 +++
 
 始めましてエンジニアの yusei-wy です。
