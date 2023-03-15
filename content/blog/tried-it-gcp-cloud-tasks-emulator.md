@@ -17,7 +17,7 @@ go get -u github.com/gin-gonic/gin
 ```
 
 `docker-compose.yml`
-```yaml:docker-compose.yml
+```yml
 version: '3'
 services:
   app:
@@ -75,7 +75,7 @@ docker compose up --build
 ```
 
 実装
-```go:main.go
+```go
 package main
 
 import (

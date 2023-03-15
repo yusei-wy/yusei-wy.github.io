@@ -1,136 +1,136 @@
-<!doctype html><html lang=ja><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="width=device-width,initial-scale=1.0" name=viewport><title>GCP CloudTasks Emulator 試してみた </title><link href="https://yusei-wy.github.io/ atom.xml" rel=alternate title=yusei-wy.github.io type=application/atom+xml><link href=https://yusei-wy.github.io/main.css media=screen rel=stylesheet><link href=https://yusei-wy.github.io/style.css media=screen rel=stylesheet><meta name=description><meta content=yusei-wy.github.io property=og:title><meta content=article property=og:type><meta content=https://yusei-wy.github.io/blog/tried-it-gcp-cloud-tasks-emulator/ property=og:url><meta property=og:description><meta content=yusei-wy.github.io property=og:site_name><meta content="default-src 'self' ws://127.0.0.1:1024/; img-src 'self' https://*; script-src 'self'; style-src 'self'; font-src 'self'" http-equiv=Content-Security-Policy><body><div class=base-container><header class=header><div class=navbar><div class="nav-title nav-navs"><a class="nav-links home-title" href=https://yusei-wy.github.io>yusei-wy.github.io</a></div><nav class="socials nav-navs"><a class="nav-links social" rel="noopener noreferrer" href=https://twitter.com/yusei_wy target=_blank> <img alt=twitter src=/social_icons/twitter.svg title=twitter> </a><a class="nav-links social" rel="noopener noreferrer" href=https://github.com/yusei-wy/ target=_blank> <img alt=github src=/social_icons/github.svg title=github> </a><label class=theme-switcher for=themeswitch><div class=background></div> <input id=themeswitch type=checkbox> <div class=switch><img alt="theme switch to dark" class=moon src=/menu_icon/moon.png><img alt="theme switch to light" class=sun src=/menu_icon/sun.png></div></label></nav></div></header><main class="main content"><h1 class=title>GCP CloudTasks Emulator 試してみた</h1><p class=subtitle><strong>2023-03-15</strong><p>今日は Google Cloud Tasks をローカルでエミュレートしてみたので、手順や詰まったポイントをまとめました。<h2 id=hazimeni>はじめに</h2><p>作業環境を構築とパッケージの取得<pre class=language-sh data-lang=sh style=background-color:#282a36;color:#f8f8f2;><code class=language-sh data-lang=sh><span style=color:#50fa7b;>go</span><span> mod init cloudtasks_emulator_example
-</span><span style=color:#50fa7b;>go</span><span> get cloud.google.com/go/cloudtasks/apiv2
-</span><span style=color:#50fa7b;>go</span><span> get cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb
-</span><span style=color:#50fa7b;>go</span><span> get</span><span style=font-style:italic;color:#ffb86c;> -u</span><span> github.com/gin-gonic/gin
-</span></code></pre><p><code>docker-compose.yml</code><pre class=language-yaml:docker-compose.yml data-lang=yaml:docker-compose.yml style=background-color:#282a36;color:#f8f8f2;><code class=language-yaml:docker-compose.yml data-lang=yaml:docker-compose.yml><span>version: '3'
-</span><span>services:
-</span><span>  app:
-</span><span>    build:
-</span><span>      context: .
-</span><span>      dockerfile: ./Dockerfile
-</span><span>    ports:
-</span><span>      - "${APP_PORT}:8080"
-</span><span>    env_file:
-</span><span>      - .env
-</span><span>    volumes:
-</span><span>      - ./:/go/src
-</span><span>    tty: true
-</span><span>
-</span><span>  gcloud-tasks-emulator:
-</span><span>    image: ghcr.io/aertje/cloud-tasks-emulator:latest
-</span><span>    command: -host 0.0.0.0 -port 8123
-</span><span>    ports:
-</span><span>      - "${TASKS_PORT:-8123}:8123"
-</span><span>    env_file:
-</span><span>      - .env
-</span></code></pre><p><code>Dockerfile</code><pre class=language-Dockerfile data-lang=Dockerfile style=background-color:#282a36;color:#f8f8f2;><code class=language-Dockerfile data-lang=Dockerfile><span style=color:#ff79c6;>FROM</span><span> golang:1.20-bullseye
-</span><span>
-</span><span style=color:#ff79c6;>WORKDIR </span><span>/go/src
-</span><span style=color:#ff79c6;>COPY</span><span> ./ .
-</span><span>
-</span><span style=color:#ff79c6;>RUN </span><span>go install github.com/cosmtrek/air@latest
-</span><span>
-</span><span style=color:#ff79c6;>CMD </span><span>[</span><span style=color:#f1fa8c;>"air"</span><span>, </span><span style=color:#f1fa8c;>"-c"</span><span>, </span><span style=color:#f1fa8c;>".air.toml"</span><span>]
-</span></code></pre><p><code>.env</code><pre class=language-env data-lang=env style=background-color:#282a36;color:#f8f8f2;><code class=language-env data-lang=env><span>APP_PORT=8000
-</span><span>APP_ENGINE_EMULATOR_HOST=http://localhost:8000
-</span><span># &LTPROJECT_ID> や &LTLOCATION_ID> は何でもいい
-</span><span>CLOUD_TASKS_PARENT=projects/dev/locations/here
-</span></code></pre><p>hot reload するための air を初期化<pre class=language-sh data-lang=sh style=background-color:#282a36;color:#f8f8f2;><code class=language-sh data-lang=sh><span style=color:#50fa7b;>docker-compose</span><span> run</span><span style=font-style:italic;color:#ffb86c;> --rm</span><span> app air init
-</span></code></pre><h2 id=cloud-tasks-emulator-nirikuesuto>Cloud Tasks Emulator にリクエスト</h2><p>まずは docker container の起動<pre class=language-sh data-lang=sh style=background-color:#282a36;color:#f8f8f2;><code class=language-sh data-lang=sh><span style=color:#50fa7b;>docker</span><span> compose up</span><span style=font-style:italic;color:#ffb86c;> --build
-</span></code></pre><p>実装<pre class=language-go:main.go data-lang=go:main.go style=background-color:#282a36;color:#f8f8f2;><code class=language-go:main.go data-lang=go:main.go><span>package main
-</span><span>
-</span><span>import (
-</span><span>	"context"
-</span><span>	"log"
-</span><span>	"net/http"
-</span><span>	"os"
-</span><span>
-</span><span>	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
-</span><span>	"cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb"
-</span><span>	"github.com/gin-gonic/gin"
-</span><span>	"google.golang.org/api/option"
-</span><span>	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
-</span><span>	"google.golang.org/grpc"
-</span><span>)
-</span><span>
-</span><span>func main() {
-</span><span>	r := gin.Default()
-</span><span>	r.GET("/ping", func(c *gin.Context) {
-</span><span>		c.JSON(200, gin.H{
-</span><span>			"message": "pong",
-</span><span>		})
-</span><span>	})
-</span><span>	r.GET("/queues/:queue_id", testqueue)
-</span><span>	r.Run()
-</span><span>}
-</span><span>
-</span><span>func testqueue(c *gin.Context) {
-</span><span>	ctx := context.Background()
-</span><span>	queueId := c.Param("queue_id")
-</span><span>
-</span><span>	conn, err := grpc.Dial("gcloud-tasks-emulator:8123", grpc.WithInsecure())
-</span><span>	if err != nil {
-</span><span>		log.Fatalf("gRPC Dial: %v", err)
-</span><span>	}
-</span><span>	defer conn.Close()
-</span><span>
-</span><span>	clientOpt := option.WithGRPCConn(conn)
-</span><span>	client, err := cloudtasks.NewClient(ctx, clientOpt)
-</span><span>	if err != nil {
-</span><span>		log.Fatalf("cloudtasks NewClient: %v", err)
-</span><span>	}
-</span><span>	defer client.Close()
-</span><span>
-</span><span>	_, err = createQueue(ctx, conn, client, queueId)
-</span><span>	if err != nil {
-</span><span>		log.Fatalf("%v", err)
-</span><span>	}
-</span><span>
-</span><span>	parent := os.Getenv("CLOUD_TASKS_PARENT")
-</span><span>	createTaskRequest := taskspb.CreateTaskRequest{
-</span><span>		Parent: parent + "/queues/" + queueId,
-</span><span>		Task: &taskspb.Task{
-</span><span>			MessageType: &taskspb.Task_HttpRequest{
-</span><span>				HttpRequest: &taskspb.HttpRequest{
-</span><span>					Url: "https://yahoo.co.jp",
-</span><span>				},
-</span><span>			},
-</span><span>		},
-</span><span>	}
-</span><span>	createdTask, err := client.CreateTask(ctx, &createTaskRequest)
-</span><span>	if err != nil {
-</span><span>		log.Fatalf("client CreateTask: %v", err)
-</span><span>	}
-</span><span>
-</span><span>	c.String(http.StatusOK, createdTask.String())
-</span><span>}
-</span><span>
-</span><span>func createQueue(
-</span><span>	ctx context.Context,
-</span><span>	conn *grpc.ClientConn,
-</span><span>	client *cloudtasks.Client,
-</span><span>	queueId string,
-</span><span>) (*cloudtaskspb.Queue, error) {
-</span><span>	parent := os.Getenv("CLOUD_TASKS_PARENT")
-</span><span>	createQueueRequest := taskspb.CreateQueueRequest{
-</span><span>		Parent: parent,
-</span><span>		Queue:  &cloudtaskspb.Queue{Name: parent + "/queues/" + queueId},
-</span><span>	}
-</span><span>	createQueueResp, err := client.CreateQueue(ctx, &createQueueRequest)
-</span><span>	if err != nil {
-</span><span>		return nil, err
-</span><span>	}
-</span><span>
-</span><span>	return createQueueResp, nil
-</span><span>}
-</span></code></pre><p><code>/queues/:queue_id</code> にアクセスすることで任意の queue とタスクを作成して実行できる。<h2 id=queue-wozuo-cheng-surutaimingudeeragafa-sheng>Queue を作成するタイミングでエラーが発生</h2><pre style=background-color:#282a36;color:#f8f8f2;><code><span>rpc error: code = InvalidArgument desc = Queue name must be formatted: "projects/&LTPROJECT_ID>/locations/&LTLOCATION_ID>/queues/&LTQUEUE_ID>"
-</span></code></pre><p>Go のサンプルでは以下のように <code>taskspb.CreateQueueRequest</code> を生成している<pre class=language-go data-lang=go style=background-color:#282a36;color:#f8f8f2;><code class=language-go data-lang=go><span>createQueueRequest </span><span style=color:#ff79c6;>:= </span><span style=color:#ffffff;>taskspb</span><span style=color:#ff79c6;>.</span><span style=color:#ffffff;>CreateQueueRequest</span><span>{
-</span><span>    </span><span style=color:#ffffff;>Parent</span><span>: </span><span style=color:#ffffff;>parent</span><span>,
-</span><span>    </span><span style=color:#ffffff;>Queue</span><span>: </span><span style=color:#ffffff;>parent </span><span style=color:#ff79c6;>+ </span><span style=color:#f1fa8c;>"/queues/test"</span><span>,
-</span><span>}
-</span></code></pre><p>正しくはこちら<pre class=language-go data-lang=go style=background-color:#282a36;color:#f8f8f2;><code class=language-go data-lang=go><span>createQueueRequest </span><span style=color:#ff79c6;>:= </span><span style=color:#ffffff;>taskspb</span><span style=color:#ff79c6;>.</span><span style=color:#ffffff;>CreateQueueRequest</span><span>{
-</span><span>	</span><span style=color:#ffffff;>Parent</span><span>: </span><span style=color:#ffffff;>parent</span><span>,
-</span><span>	</span><span style=color:#ffffff;>Queue</span><span>:  </span><span style=color:#ff79c6;>&</span><span style=color:#ffffff;>cloudtaskspb</span><span style=color:#ff79c6;>.</span><span style=color:#ffffff;>Queue</span><span>{</span><span style=color:#ffffff;>Name</span><span>: </span><span style=color:#ffffff;>parent </span><span style=color:#ff79c6;>+ </span><span style=color:#f1fa8c;>"/queues/test"</span><span>},
-</span><span>}
-</span></code></pre><h2 id=ben-fan-deli-yong-surunara>本番で利用するなら</h2><p>プロジェクト ID には Cloud Tasks API を有効にした Project ID を指定する。<p>ロケーション ID は以下のコマンドで確認して、該当するものを指定<pre class=language-sh data-lang=sh style=background-color:#282a36;color:#f8f8f2;><code class=language-sh data-lang=sh><span style=color:#50fa7b;>gcloud</span><span> tasks locations list
+<!doctype html><html lang=ja><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="width=device-width,initial-scale=1.0" name=viewport><title>GCP CloudTasks Emulator 試してみた </title><link href="https://yusei-wy.github.io/ atom.xml" rel=alternate title=yusei-wy.github.io type=application/atom+xml><link href=https://yusei-wy.github.io/main.css media=screen rel=stylesheet><link href=https://yusei-wy.github.io/style.css media=screen rel=stylesheet><link href=https://yusei-wy.github.io/syntax-theme-dark.css rel=stylesheet><meta name=description><meta content=yusei-wy.github.io property=og:title><meta content=article property=og:type><meta content=https://yusei-wy.github.io/blog/tried-it-gcp-cloud-tasks-emulator/ property=og:url><meta property=og:description><meta content=yusei-wy.github.io property=og:site_name><meta content="default-src 'self' ws://127.0.0.1:1024/; img-src 'self' https://*; script-src 'self'; style-src 'self'; font-src 'self'" http-equiv=Content-Security-Policy><body><div class=base-container><header class=header><div class=navbar><div class="nav-title nav-navs"><a class="nav-links home-title" href=https://yusei-wy.github.io>yusei-wy.github.io</a></div><nav class="socials nav-navs"><a class="nav-links social" rel="noopener noreferrer" href=https://twitter.com/yusei_wy target=_blank> <img alt=twitter src=/social_icons/twitter.svg title=twitter> </a><a class="nav-links social" rel="noopener noreferrer" href=https://github.com/yusei-wy/ target=_blank> <img alt=github src=/social_icons/github.svg title=github> </a><label class=theme-switcher for=themeswitch><div class=background></div> <input id=themeswitch type=checkbox> <div class=switch><img alt="theme switch to dark" class=moon src=/menu_icon/moon.png><img alt="theme switch to light" class=sun src=/menu_icon/sun.png></div></label></nav></div></header><main class="main content"><h1 class=title>GCP CloudTasks Emulator 試してみた</h1><p class=subtitle><strong>2023-03-15</strong><p>今日は Google Cloud Tasks をローカルでエミュレートしてみたので、手順や詰まったポイントをまとめました。<h2 id=hazimeni>はじめに</h2><p>作業環境を構築とパッケージの取得<pre class="language-sh z-code" data-lang=sh><code class=language-sh data-lang=sh><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">go</span></span><span class="z-meta z-function-call z-arguments z-shell"> mod init cloudtasks_emulator_example</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">go</span></span><span class="z-meta z-function-call z-arguments z-shell"> get cloud.google.com/go/cloudtasks/apiv2</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">go</span></span><span class="z-meta z-function-call z-arguments z-shell"> get cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb</span>
+<span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">go</span></span><span class="z-meta z-function-call z-arguments z-shell"> get<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> -</span>u</span> github.com/gin-gonic/gin</span>
+</span></code></pre><p><code>docker-compose.yml</code><pre class="language-yml z-code" data-lang=yml><code class=language-yml data-lang=yml><span class="z-source z-yaml"><span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">version</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-string z-quoted z-single z-yaml"><span class="z-punctuation z-definition z-string z-begin z-yaml">'</span>3<span class="z-punctuation z-definition z-string z-end z-yaml">'</span></span>
+<span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">services</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+  <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">app</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">build</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+      <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">context</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-constant z-numeric z-float z-decimal z-yaml"><span class="z-punctuation z-separator z-decimal z-yaml">.</span></span>
+      <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">dockerfile</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-string z-unquoted z-plain z-out z-yaml">./Dockerfile</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">ports</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+      <span class="z-punctuation z-definition z-block z-sequence z-item z-yaml">-</span> <span class="z-string z-quoted z-double z-yaml"><span class="z-punctuation z-definition z-string z-begin z-yaml">"</span>${APP_PORT}:8080<span class="z-punctuation z-definition z-string z-end z-yaml">"</span></span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">env_file</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+      <span class="z-punctuation z-definition z-block z-sequence z-item z-yaml">-</span> <span class="z-string z-unquoted z-plain z-out z-yaml">.env</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">volumes</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+      <span class="z-punctuation z-definition z-block z-sequence z-item z-yaml">-</span> <span class="z-string z-unquoted z-plain z-out z-yaml">./:/go/src</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">tty</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-constant z-language z-boolean z-yaml">true</span>
+
+  <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">gcloud-tasks-emulator</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">image</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-string z-unquoted z-plain z-out z-yaml">ghcr.io/aertje/cloud-tasks-emulator:latest</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">command</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span> <span class="z-string z-unquoted z-plain z-out z-yaml">-host 0.0.0.0 -port 8123</span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">ports</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+      <span class="z-punctuation z-definition z-block z-sequence z-item z-yaml">-</span> <span class="z-string z-quoted z-double z-yaml"><span class="z-punctuation z-definition z-string z-begin z-yaml">"</span>${TASKS_PORT:-8123}:8123<span class="z-punctuation z-definition z-string z-end z-yaml">"</span></span>
+    <span class="z-string z-unquoted z-plain z-out z-yaml"><span class="z-entity z-name z-tag z-yaml">env_file</span></span><span class="z-punctuation z-separator z-key-value z-mapping z-yaml">:</span>
+      <span class="z-punctuation z-definition z-block z-sequence z-item z-yaml">-</span> <span class="z-string z-unquoted z-plain z-out z-yaml">.env</span>
+</span></code></pre><p><code>Dockerfile</code><pre class="language-Dockerfile z-code" data-lang=Dockerfile><code class=language-Dockerfile data-lang=Dockerfile><span class="z-source z-dockerfile"><span class="z-keyword z-control z-dockerfile">FROM</span> golang:<span class="z-entity z-name z-enum z-tag-digest">1.20-bullseye</span>
+
+<span class="z-keyword z-control z-dockerfile">WORKDIR </span>/go/src
+<span class="z-keyword z-control z-dockerfile">COPY</span> ./ .
+
+<span class="z-keyword z-control z-dockerfile">RUN </span>go install github.com/cosmtrek/air@latest
+
+<span class="z-keyword z-operator z-dockerfile">CMD </span>[<span class="z-string z-quoted z-double z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">"</span>air<span class="z-punctuation z-definition z-string z-end z-dockerfile">"</span></span>, <span class="z-string z-quoted z-double z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">"</span>-c<span class="z-punctuation z-definition z-string z-end z-dockerfile">"</span></span>, <span class="z-string z-quoted z-double z-dockerfile"><span class="z-punctuation z-definition z-string z-begin z-dockerfile">"</span>.air.toml<span class="z-punctuation z-definition z-string z-end z-dockerfile">"</span></span>]
+</span></code></pre><p><code>.env</code><pre class="language-env z-code" data-lang=env><code class=language-env data-lang=env><span class="z-text z-plain">APP_PORT=8000
+APP_ENGINE_EMULATOR_HOST=http://localhost:8000
+# &LTPROJECT_ID> や &LTLOCATION_ID> は何でもいい
+CLOUD_TASKS_PARENT=projects/dev/locations/here
+</span></code></pre><p>hot reload するための air を初期化<pre class="language-sh z-code" data-lang=sh><code class=language-sh data-lang=sh><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">docker-compose</span></span><span class="z-meta z-function-call z-arguments z-shell"> run<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>rm</span> app air init</span>
+</span></code></pre><h2 id=cloud-tasks-emulator-nirikuesuto>Cloud Tasks Emulator にリクエスト</h2><p>まずは docker container の起動<pre class="language-sh z-code" data-lang=sh><code class=language-sh data-lang=sh><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">docker</span></span><span class="z-meta z-function-call z-arguments z-shell"> compose up<span class="z-variable z-parameter z-option z-shell"><span class="z-punctuation z-definition z-parameter z-shell"> --</span>build</span></span>
+</span></code></pre><p>実装<pre class="language-go z-code" data-lang=go><code class=language-go data-lang=go><span class="z-source z-go"><span class="z-keyword z-other z-package z-go">package</span> <span class="z-variable z-other z-go">main</span>
+
+<span class="z-keyword z-other z-import z-go">import</span> <span class="z-punctuation z-section z-parens z-begin z-go">(</span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>context<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>log<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>net/http<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>os<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+
+	<span class="z-variable z-other z-go">cloudtasks</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>cloud.google.com/go/cloudtasks/apiv2<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>github.com/gin-gonic/gin<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>google.golang.org/api/option<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-variable z-other z-go">taskspb</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>google.golang.org/genproto/googleapis/cloud/tasks/v2<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+	<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>google.golang.org/grpc<span class="z-punctuation z-definition z-string z-end z-go">"</span></span>
+<span class="z-punctuation z-section z-parens z-end z-go">)</span>
+
+<span class="z-storage z-type z-keyword z-function z-go">func</span> <span class="z-entity z-name z-function z-go">main</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+	<span class="z-variable z-declaration z-go">r</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">gin</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Default</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-other z-go">r</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">GET</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>/ping<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-storage z-type z-keyword z-function z-go">func</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-parameter z-go">c</span> <span class="z-keyword z-operator z-go">*</span><span class="z-variable z-other z-go">gin</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">Context</span><span class="z-punctuation z-section z-parens z-end z-go">)</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">c</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">JSON</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-constant z-numeric z-integer z-decimal z-go">200</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">gin</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">H</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+			<span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>message<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">:</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>pong<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span>
+		<span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-other z-go">r</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">GET</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>/queues/:queue_id<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">testqueue</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-other z-go">r</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Run</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+
+<span class="z-storage z-type z-keyword z-function z-go">func</span> <span class="z-entity z-name z-function z-go">testqueue</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-parameter z-go">c</span> <span class="z-keyword z-operator z-go">*</span><span class="z-variable z-other z-go">gin</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">Context</span><span class="z-punctuation z-section z-parens z-end z-go">)</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+	<span class="z-variable z-declaration z-go">ctx</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">context</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Background</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-declaration z-go">queueId</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">c</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Param</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>queue_id<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+
+	<span class="z-variable z-declaration z-go">conn</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-declaration z-go">err</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">grpc</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Dial</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>gcloud-tasks-emulator:8123<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">grpc</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">WithInsecure</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-keyword z-control z-go">if</span> <span class="z-variable z-other z-go">err</span> <span class="z-keyword z-operator z-go">!=</span> <span class="z-constant z-language z-go">nil</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">log</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Fatalf</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>gRPC Dial: <span class="z-constant z-other z-placeholder z-go">%v</span><span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">err</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+	<span class="z-keyword z-control z-go">defer</span> <span class="z-variable z-other z-go">conn</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Close</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+
+	<span class="z-variable z-declaration z-go">clientOpt</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">option</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">WithGRPCConn</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-other z-go">conn</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-declaration z-go">client</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-declaration z-go">err</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">cloudtasks</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">NewClient</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-other z-go">ctx</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">clientOpt</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-keyword z-control z-go">if</span> <span class="z-variable z-other z-go">err</span> <span class="z-keyword z-operator z-go">!=</span> <span class="z-constant z-language z-go">nil</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">log</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Fatalf</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>cloudtasks NewClient: <span class="z-constant z-other z-placeholder z-go">%v</span><span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">err</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+	<span class="z-keyword z-control z-go">defer</span> <span class="z-variable z-other z-go">client</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Close</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+
+	<span class="z-variable z-language z-blank z-go">_</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">err</span> <span class="z-keyword z-operator z-assignment z-go">=</span> <span class="z-variable z-function z-go">createQueue</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-other z-go">ctx</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">conn</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">client</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">queueId</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-keyword z-control z-go">if</span> <span class="z-variable z-other z-go">err</span> <span class="z-keyword z-operator z-go">!=</span> <span class="z-constant z-language z-go">nil</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">log</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Fatalf</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span><span class="z-constant z-other z-placeholder z-go">%v</span><span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">err</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+
+	<span class="z-variable z-declaration z-go">parent</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">os</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Getenv</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>CLOUD_TASKS_PARENT<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-declaration z-go">createTaskRequest</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">CreateTaskRequest</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">Parent</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span> <span class="z-keyword z-operator z-go">+</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>/queues/<span class="z-punctuation z-definition z-string z-end z-go">"</span></span> <span class="z-keyword z-operator z-go">+</span> <span class="z-variable z-other z-go">queueId</span><span class="z-punctuation z-separator z-go">,</span>
+		<span class="z-variable z-other z-go">Task</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">Task</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+			<span class="z-variable z-other z-go">MessageType</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">Task_HttpRequest</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+				<span class="z-variable z-other z-go">HttpRequest</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">HttpRequest</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+					<span class="z-variable z-other z-go">Url</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>https://yahoo.co.jp<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span>
+				<span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-separator z-go">,</span>
+			<span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-separator z-go">,</span>
+		<span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-separator z-go">,</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+	<span class="z-variable z-declaration z-go">createdTask</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-declaration z-go">err</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">client</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">CreateTask</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-other z-go">ctx</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">createTaskRequest</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-keyword z-control z-go">if</span> <span class="z-variable z-other z-go">err</span> <span class="z-keyword z-operator z-go">!=</span> <span class="z-constant z-language z-go">nil</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">log</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Fatalf</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>client CreateTask: <span class="z-constant z-other z-placeholder z-go">%v</span><span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">err</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+
+	<span class="z-variable z-other z-go">c</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">String</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-other z-go">http</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">StatusOK</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">createdTask</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">String</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-punctuation z-section z-parens z-end z-go">)</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+
+<span class="z-storage z-type z-keyword z-function z-go">func</span> <span class="z-entity z-name z-function z-go">createQueue</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span>
+	<span class="z-variable z-parameter z-go">ctx</span> <span class="z-variable z-other z-go">context</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">Context</span><span class="z-punctuation z-separator z-go">,</span>
+	<span class="z-variable z-parameter z-go">conn</span> <span class="z-keyword z-operator z-go">*</span><span class="z-variable z-other z-go">grpc</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">ClientConn</span><span class="z-punctuation z-separator z-go">,</span>
+	<span class="z-variable z-parameter z-go">client</span> <span class="z-keyword z-operator z-go">*</span><span class="z-variable z-other z-go">cloudtasks</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">Client</span><span class="z-punctuation z-separator z-go">,</span>
+	<span class="z-variable z-parameter z-go">queueId</span> <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">string</span></span><span class="z-punctuation z-separator z-go">,</span>
+<span class="z-punctuation z-section z-parens z-end z-go">)</span> <span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-keyword z-operator z-go">*</span><span class="z-variable z-other z-go">cloudtaskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-storage z-type z-go">Queue</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-storage z-type z-go"><span class="z-support z-type z-builtin z-go">error</span></span><span class="z-punctuation z-section z-parens z-end z-go">)</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+	<span class="z-variable z-declaration z-go">parent</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">os</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">Getenv</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>CLOUD_TASKS_PARENT<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-variable z-declaration z-go">createQueueRequest</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">CreateQueueRequest</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-variable z-other z-go">Parent</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span><span class="z-punctuation z-separator z-go">,</span>
+		<span class="z-variable z-other z-go">Queue</span><span class="z-punctuation z-separator z-go">:</span>  <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">cloudtaskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">Queue</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span><span class="z-variable z-other z-go">Name</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span> <span class="z-keyword z-operator z-go">+</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>/queues/<span class="z-punctuation z-definition z-string z-end z-go">"</span></span> <span class="z-keyword z-operator z-go">+</span> <span class="z-variable z-other z-go">queueId</span><span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-separator z-go">,</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+	<span class="z-variable z-declaration z-go">createQueueResp</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-declaration z-go">err</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">client</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-function z-go">CreateQueue</span><span class="z-punctuation z-section z-parens z-begin z-go">(</span><span class="z-variable z-other z-go">ctx</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">createQueueRequest</span><span class="z-punctuation z-section z-parens z-end z-go">)</span>
+	<span class="z-keyword z-control z-go">if</span> <span class="z-variable z-other z-go">err</span> <span class="z-keyword z-operator z-go">!=</span> <span class="z-constant z-language z-go">nil</span> <span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+		<span class="z-keyword z-control z-go">return</span> <span class="z-constant z-language z-go">nil</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-variable z-other z-go">err</span>
+	<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+
+	<span class="z-keyword z-control z-go">return</span> <span class="z-variable z-other z-go">createQueueResp</span><span class="z-punctuation z-separator z-go">,</span> <span class="z-constant z-language z-go">nil</span>
+<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+</span></code></pre><p><code>/queues/:queue_id</code> にアクセスすることで任意の queue とタスクを作成して実行できる。<h2 id=queue-wozuo-cheng-surutaimingudeeragafa-sheng>Queue を作成するタイミングでエラーが発生</h2><pre class=z-code><code><span class="z-text z-plain">rpc error: code = InvalidArgument desc = Queue name must be formatted: "projects/&LTPROJECT_ID>/locations/&LTLOCATION_ID>/queues/&LTQUEUE_ID>"
+</span></code></pre><p>Go のサンプルでは以下のように <code>taskspb.CreateQueueRequest</code> を生成している<pre class="language-go z-code" data-lang=go><code class=language-go data-lang=go><span class="z-source z-go"><span class="z-variable z-declaration z-go">createQueueRequest</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">CreateQueueRequest</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+    <span class="z-variable z-other z-go">Parent</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span><span class="z-punctuation z-separator z-go">,</span>
+    <span class="z-variable z-other z-go">Queue</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span> <span class="z-keyword z-operator z-go">+</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>/queues/test<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-separator z-go">,</span>
+<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+</span></code></pre><p>正しくはこちら<pre class="language-go z-code" data-lang=go><code class=language-go data-lang=go><span class="z-source z-go"><span class="z-variable z-declaration z-go">createQueueRequest</span> <span class="z-keyword z-operator z-assignment z-go">:=</span> <span class="z-variable z-other z-go">taskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">CreateQueueRequest</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span>
+	<span class="z-variable z-other z-go">Parent</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span><span class="z-punctuation z-separator z-go">,</span>
+	<span class="z-variable z-other z-go">Queue</span><span class="z-punctuation z-separator z-go">:</span>  <span class="z-keyword z-operator z-go">&</span><span class="z-variable z-other z-go">cloudtaskspb</span><span class="z-punctuation z-accessor z-dot z-go">.</span><span class="z-variable z-other z-member z-go">Queue</span><span class="z-meta z-block z-go"><span class="z-punctuation z-section z-braces z-begin z-go">{</span><span class="z-variable z-other z-go">Name</span><span class="z-punctuation z-separator z-go">:</span> <span class="z-variable z-other z-go">parent</span> <span class="z-keyword z-operator z-go">+</span> <span class="z-string z-quoted z-double z-go"><span class="z-punctuation z-definition z-string z-begin z-go">"</span>/queues/test<span class="z-punctuation z-definition z-string z-end z-go">"</span></span><span class="z-punctuation z-section z-braces z-end z-go">}</span></span><span class="z-punctuation z-separator z-go">,</span>
+<span class="z-punctuation z-section z-braces z-end z-go">}</span></span>
+</span></code></pre><h2 id=ben-fan-deli-yong-surunara>本番で利用するなら</h2><p>プロジェクト ID には Cloud Tasks API を有効にした Project ID を指定する。<p>ロケーション ID は以下のコマンドで確認して、該当するものを指定<pre class="language-sh z-code" data-lang=sh><code class=language-sh data-lang=sh><span class="z-source z-shell z-bash"><span class="z-meta z-function-call z-shell"><span class="z-variable z-function z-shell">gcloud</span></span><span class="z-meta z-function-call z-arguments z-shell"> tasks locations list</span>
 </span></code></pre><h2 id=can-kao>参考</h2><p><a href=https://github.com/aertje/cloud-tasks-emulator rel=noopener target=_blank>https://github.com/aertje/cloud-tasks-emulator</a></main><footer class=footer><section><nav><span classname=desktop-only>yusei-wy.github.io</span></nav></section><script src=https://yusei-wy.github.io/js/main.js></script></footer></div>
