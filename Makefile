@@ -11,3 +11,4 @@ deploy:
 	git add .
 	git commit -m "deploy $(DATETIME)"
 	git push -u origin main
+	echo deployed
