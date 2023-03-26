@@ -35,17 +35,19 @@
     <meta name="robots" content="noindex, follow">
     {% endif %}
 
-    <meta property="og:title" content="{{ config.title }}">
+    {% if page.title %}
+    <meta property="og:title" content="{{ page.title }}">
+    {% endif %}
     <meta property="og:type" content="article" />
 
-    {% if config.extra.headerImage %}
-    <meta property="og:image" content="{{ config.extra.headerImage }}">
-    <meta name="twitter:card" content="{{ config.extra.headerImage }}">
+    {% if page.extra.image %}
+    {% set image = resize_image(path=page.extra.image, width=640, height=360, op='fit_width') %}
+    <meta property="og:image" content="{{ image.url | safe }}">
+    <meta name="twitter:card" content="summary_large_image">
     {% endif %}
 
     {% set current_url = current_url | default(value="/") %}
     <meta property="og:url" content="{{ current_url }}">
-
     <meta property="og:description" content="{{ config.description }}">
     <meta property="og:site_name" content="{{ config.title }}">
 
